@@ -11,6 +11,24 @@ struct pop_entry {
   char boro[15];
 };
 
+void add_data() {
+    printf("\nEnter new data (format like year,population,borough): ");
+    
+    int year;
+    int pop;
+    char boro[100];
+    scanf("%d,%d,%s", &year, &pop, boro);
+    
+    struct pop_entry new_entry;
+    new_entry.year = year;
+    new_entry.population = pop;
+    strcpy(new_entry.boro, boro);
+    
+    int file = open("pop_data", O_WRONLY | O_APPEND, 0);
+    write(file, &new_entry, sizeof(struct pop_entry));
+    close(file);
+}
+
 void read_data() {
     struct stat stats;
     stat("pop_data", &stats);
@@ -26,6 +44,8 @@ void read_data() {
     for (i = 0; i < len; i++) {
         printf("Entry | Year: %d, Population: %d, Borough: %s\n", entries[i].year, entries[i].population, entries[i].boro);
     }
+    
+    close(file);
 }
 
 void write_file(struct pop_entry *entries, int len) {
