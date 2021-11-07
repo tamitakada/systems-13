@@ -11,6 +11,48 @@ struct pop_entry {
   char boro[15];
 };
 
+void update_data() {
+    struct stat stats;
+    stat("pop_data", &stats);
+    
+    int len = stats.st_size / sizeof(struct pop_entry);
+    struct pop_entry entries[len];
+    
+    int file = open("pop_data", O_RDONLY, 0);
+    
+    read(file, entries, stats.st_size);
+    
+    int i;
+    for (i = 0; i < len; i++) {
+        printf("Entry #%d | Year: %d, Population: %d, Borough: %s\n", i, entries[i].year, entries[i].population, entries[i].boro);
+    }
+    
+    close(file);
+    
+    printf("\nEnter entry number to update: ");
+    
+    int entry;
+    scanf("%d", &entry);
+    
+    printf("\nEnter new entry info: ");
+    
+    int year;
+    int pop;
+    char boro[100];
+    scanf("%d,%d,%s", &year, &pop, boro);
+    
+    struct pop_entry new_entry;
+    new_entry.year = year;
+    new_entry.population = pop;
+    strcpy(new_entry.boro, boro);
+    
+    entries[entry] = new_entry;
+    
+    file = open("pop_data", O_WRONLY | O_TRUNC, 0);
+    write(file, entries, sizeof(struct pop_entry) * len);
+    close(file);
+}
+
 void add_data() {
     printf("\nEnter new data (format like year,population,borough): ");
     
@@ -42,7 +84,7 @@ void read_data() {
     
     int i;
     for (i = 0; i < len; i++) {
-        printf("Entry | Year: %d, Population: %d, Borough: %s\n", entries[i].year, entries[i].population, entries[i].boro);
+        printf("Entry #%d | Year: %d, Population: %d, Borough: %s\n", i, entries[i].year, entries[i].population, entries[i].boro);
     }
     
     close(file);
